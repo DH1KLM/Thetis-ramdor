@@ -7478,6 +7478,13 @@ namespace Thetis
         private void udDisplayGridMax_ValueChanged(object sender, System.EventArgs e)
         {
             if (initializing) return;
+            //[2.10.3.6]MW0LGE limit
+            if (udDisplayGridMax.Value < udDisplayGridMin.Value + udDisplayGridStep.Value)
+            {
+                udDisplayGridMax.Value = udDisplayGridMin.Value + udDisplayGridStep.Value;
+                return;
+            }
+            //
             UpdateDisplayGridBandInfo();
             switch (console.RX1Band)
             {
@@ -7548,6 +7555,13 @@ namespace Thetis
         private void udDisplayGridMin_ValueChanged(object sender, System.EventArgs e)
         {
             if (initializing) return;
+            //[2.10.3.6]MW0LGE limit
+            if(udDisplayGridMin.Value > udDisplayGridMax.Value - udDisplayGridStep.Value)
+            {
+                udDisplayGridMin.Value = udDisplayGridMax.Value - udDisplayGridStep.Value;
+                return;
+            }
+            //
             UpdateDisplayGridBandInfo();
             switch (console.RX1Band)
             {
@@ -7624,7 +7638,13 @@ namespace Thetis
         private void udRX2DisplayGridMax_ValueChanged(object sender, System.EventArgs e)
         {
             if (initializing) return;
-
+            //[2.10.3.6]MW0LGE limit
+            if (udRX2DisplayGridMax.Value < udRX2DisplayGridMin.Value + udRX2DisplayGridStep.Value)
+            {
+                udRX2DisplayGridMax.Value = udRX2DisplayGridMin.Value + udRX2DisplayGridStep.Value;
+                return;
+            }
+            //
             UpdateDisplayGridBandInfo();
             switch (console.RX2Band)
             {
@@ -7696,6 +7716,13 @@ namespace Thetis
         private void udRX2DisplayGridMin_ValueChanged(object sender, System.EventArgs e)
         {
             if (initializing) return;
+            //[2.10.3.6]MW0LGE limit
+            if (udRX2DisplayGridMin.Value > udRX2DisplayGridMax.Value - udRX2DisplayGridStep.Value)
+            {
+                udRX2DisplayGridMin.Value = udRX2DisplayGridMax.Value - udRX2DisplayGridStep.Value;
+                return;
+            }
+            //
             UpdateDisplayGridBandInfo();
             switch (console.RX2Band)
             {
@@ -7842,6 +7869,13 @@ namespace Thetis
         private void udDisplayWaterfallLowLevel_ValueChanged(object sender, System.EventArgs e)
         {
             if (initializing) return;
+            //[2.10.3.6]MW0LGE limit
+            if(udDisplayWaterfallLowLevel.Value > udDisplayWaterfallHighLevel.Value - 3)
+            {
+                udDisplayWaterfallLowLevel.Value = udDisplayWaterfallHighLevel.Value - 3;
+                return;
+            }
+            //
             UpdateWaterfallBandInfo();
             switch (console.RX1Band)
             {
@@ -7907,6 +7941,13 @@ namespace Thetis
         private void udDisplayWaterfallHighLevel_ValueChanged(object sender, System.EventArgs e)
         {
             if (initializing) return;
+            //[2.10.3.6]MW0LGE limit
+            if (udDisplayWaterfallHighLevel.Value < udDisplayWaterfallLowLevel.Value + 3)
+            {
+                udDisplayWaterfallHighLevel.Value = udDisplayWaterfallLowLevel.Value + 3;
+                return;
+            }
+            //
             UpdateWaterfallBandInfo();
             switch (console.RX1Band)
             {
@@ -7991,6 +8032,13 @@ namespace Thetis
         private void udRX2DisplayWaterfallLowLevel_ValueChanged(object sender, System.EventArgs e)
         {
             if (initializing) return;
+            //[2.10.3.6]MW0LGE limit
+            if (udRX2DisplayWaterfallLowLevel.Value > udRX2DisplayWaterfallHighLevel.Value - 3)
+            {
+                udRX2DisplayWaterfallLowLevel.Value = udRX2DisplayWaterfallHighLevel.Value - 3;
+                return;
+            }
+            //
             UpdateWaterfallBandInfo();
             switch (console.RX2Band)
             {
@@ -8056,6 +8104,13 @@ namespace Thetis
         private void udRX2DisplayWaterfallHighLevel_ValueChanged(object sender, System.EventArgs e)
         {
             if (initializing) return;
+            //[2.10.3.6]MW0LGE limit
+            if (udRX2DisplayWaterfallHighLevel.Value < udRX2DisplayWaterfallLowLevel.Value + 3)
+            {
+                udRX2DisplayWaterfallHighLevel.Value = udRX2DisplayWaterfallLowLevel.Value + 3;
+                return;
+            }
+            //
             UpdateWaterfallBandInfo();
             switch (console.RX2Band)
             {
@@ -11919,7 +11974,6 @@ namespace Thetis
             if (power && chkVAC2Enable.Checked)
             {
                 Audio.EnableVAC2(false);
-                Thread.Sleep(1); //MW0LGE_21k9 prevent exception when using ASIO //[2.10.3.5]MW0LGE CHECK THIS
             }
 
             Audio.VAC2OutputIQ = chkVAC2DirectIQ.Checked;
@@ -21659,6 +21713,8 @@ namespace Thetis
             {
                 sTmp = parts[0];
                 bPortOk = int.TryParse(parts[1], out port);
+
+                if (bPortOk && (port < 0 || port > 65535)) bPortOk = false;
             }
 
             //check ip is valid
@@ -21785,6 +21841,8 @@ namespace Thetis
             {
                 sTmp = parts[0];
                 bPortOk = int.TryParse(parts[1], out port);
+
+                if (bPortOk && (port < 0 || port > 65535)) bPortOk = false;
             }
 
             //check ip is valid
@@ -23945,7 +24003,7 @@ namespace Thetis
         {
             if (MeterManager.TotalMeterContainers < MAX_CONTAINERS)
             {
-                string sId = MeterManager.AddMeterContainer(1, false);//, true);
+                string sId = MeterManager.AddMeterContainer(1, false);
                 updateMeter2Controls(sId);
             }
         }
@@ -23954,7 +24012,7 @@ namespace Thetis
         {
             if (MeterManager.TotalMeterContainers < MAX_CONTAINERS)
             {
-                string sId = MeterManager.AddMeterContainer(2, false);//, true);
+                string sId = MeterManager.AddMeterContainer(2, false);
                 updateMeter2Controls(sId);
             }
         }
@@ -23997,24 +24055,28 @@ namespace Thetis
                 comboContainerSelect.Text = "";
             }
 
-            btnContainerDelete.Enabled = bEnableControls;
+            bool locked = chkLockContainer.Checked;
+
+            btnContainerDelete.Enabled = bEnableControls && !locked;
             chkContainerHighlight.Enabled = bEnableControls;
             comboContainerSelect.Enabled = bEnableControls;
             clrbtnContainerBackground.Enabled = bEnableControls;
             chkContainerBorder.Enabled = bEnableControls;
             chkContainerNoTitle.Enabled = bEnableControls;
             chkMultiMeter_auto_container_height.Enabled = bEnableControls;
-            chkContainerEnable.Enabled = bEnableControls;
+            chkLockContainer.Enabled = bEnableControls;
+            chkContainerShowRX.Enabled = bEnableControls;
+            chkContainerShowTX.Enabled = bEnableControls;
             chkContainerMinimises.Enabled = bEnableControls;
             txtContainerNotes.Enabled = bEnableControls;
             lblMMContainerBackground.Enabled = bEnableControls;
             lblMMContainerNotes.Enabled = bEnableControls;
             lstMetersAvailable.Enabled = bEnableControls;
             lstMetersInUse.Enabled = bEnableControls;
-            btnAddMeterItem.Enabled = bEnableControls;
-            btnRemoveMeterItem.Enabled = bEnableControls;
-            btnMeterUp.Enabled = bEnableControls && lstMetersInUse.Items.Count > 0;
-            btnMeterDown.Enabled = bEnableControls && lstMetersInUse.Items.Count > 0;
+            btnAddMeterItem.Enabled = bEnableControls && !locked;
+            btnRemoveMeterItem.Enabled = bEnableControls && !locked;
+            btnMeterUp.Enabled = bEnableControls && !locked && lstMetersInUse.Items.Count > 0;
+            btnMeterDown.Enabled = bEnableControls && !locked && lstMetersInUse.Items.Count > 0;
 
             btnMeterCopySettings.Enabled = bEnableControls && lstMetersInUse.Items.Count > 0;
             btnMeterPasteSettings.Enabled = bEnableControls && lstMetersInUse.Items.Count > 0;
@@ -24080,19 +24142,11 @@ namespace Thetis
 
             lstMetersAvailable_SelectedIndexChanged(this, EventArgs.Empty);
             lstMetersInUse_SelectedIndexChanged(this, EventArgs.Empty);
-
-            //lstMetersInUse.ResumeLayout();
-            //lstMetersAvailable.ResumeLayout();
-
-            //lstMetersInUse.Invalidate();
-            //lstMetersAvailable.Invalidate();
-
-            //lstMetersInUse.EndUpdate();
-            //lstMetersAvailable.EndUpdate();
         }
 
         private void btnContainerDelete_Click(object sender, EventArgs e)
         {
+            if (chkLockContainer.Checked) return;
             clsContainerComboboxItem cci = (clsContainerComboboxItem)comboContainerSelect.SelectedItem;
 
             if (cci != null)
@@ -24119,7 +24173,12 @@ namespace Thetis
             chkContainerBorder.Checked = MeterManager.ContainerHasBorder(cci.ID);
             clrbtnContainerBackground.Color = MeterManager.GetContainerBackgroundColour(cci.ID);
             chkContainerNoTitle.Checked = MeterManager.ContainerNoTitleBar(cci.ID);
-            chkContainerEnable.Checked = MeterManager.ContainerShow(cci.ID);
+
+            chkLockContainer.Checked = MeterManager.ContainerLocked(cci.ID);
+            chkLockContainer_CheckedChanged(this, EventArgs.Empty); // force it
+
+            chkContainerShowRX.Checked = MeterManager.ContainerShowOnRX(cci.ID);
+            chkContainerShowTX.Checked = MeterManager.ContainerShowOnTX(cci.ID);
             chkContainerMinimises.Checked = MeterManager.ContainerMinimises(cci.ID);
             txtContainerNotes.Text = MeterManager.GetContainerNotes(cci.ID);
             chkMultiMeter_auto_container_height.Checked = MeterManager.ContainerAutoHeight(cci.ID);
@@ -24143,13 +24202,22 @@ namespace Thetis
                 MeterManager.HighlightContainer("");
             }
         }
-        private void chkContainerEnable_CheckedChanged(object sender, EventArgs e)
+        private void chkContainerShowRX_CheckedChanged(object sender, EventArgs e)
         {
             if (initializing) return;
             clsContainerComboboxItem cci = (clsContainerComboboxItem)comboContainerSelect.SelectedItem;
             if (cci != null)
             {
-                MeterManager.EnableContainer(cci.ID, chkContainerEnable.Checked);
+                MeterManager.ShowContainerOnRX(cci.ID, chkContainerShowRX.Checked);
+            }
+        }
+        private void chkContainerShowTX_CheckedChanged(object sender, EventArgs e)
+        {
+            if (initializing) return;
+            clsContainerComboboxItem cci = (clsContainerComboboxItem)comboContainerSelect.SelectedItem;
+            if (cci != null)
+            {
+                MeterManager.ShowContainerOnTX(cci.ID, chkContainerShowTX.Checked);
             }
         }
         private void txtContainerNotes_TextChanged(object sender, EventArgs e)
@@ -24165,6 +24233,7 @@ namespace Thetis
         }
         private void btnAddMeterItem_Click(object sender, EventArgs e)
         {
+            if (chkLockContainer.Checked) return;
             clsMeterTypeComboboxItem mti = lstMetersAvailable.SelectedItem as clsMeterTypeComboboxItem;
             if (mti == null) return;
 
@@ -24181,8 +24250,8 @@ namespace Thetis
 
         private void lstMetersAvailable_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (initializing) return;
-            btnAddMeterItem.Enabled = lstMetersAvailable.SelectedIndex >= 0;
+            if (initializing) return;            
+            btnAddMeterItem.Enabled = !chkLockContainer.Checked && lstMetersAvailable.SelectedIndex >= 0;
         }
 
         private void lstMetersInUse_SelectedIndexChanged(object sender, EventArgs e)
@@ -24196,9 +24265,9 @@ namespace Thetis
             else
                 setupMMSettingsGroupBoxes(MeterType.NONE);
 
-            btnRemoveMeterItem.Enabled = bEnabled;
-            btnMeterUp.Enabled = bEnabled;
-            btnMeterDown.Enabled = bEnabled;
+            btnRemoveMeterItem.Enabled = !chkLockContainer.Checked && bEnabled;
+            btnMeterUp.Enabled = !chkLockContainer.Checked && bEnabled;
+            btnMeterDown.Enabled = !chkLockContainer.Checked && bEnabled;
 
             btnMeterCopySettings.Enabled = bEnabled;
             btnMeterPasteSettings.Enabled = bEnabled && canPasteSettings();
@@ -24206,6 +24275,7 @@ namespace Thetis
 
         private void btnRemoveMeterItem_Click(object sender, EventArgs e)
         {
+            if (chkLockContainer.Checked) return;
             clsMeterTypeComboboxItem mti = lstMetersInUse.SelectedItem as clsMeterTypeComboboxItem;
             if (mti == null) return;
 
@@ -24221,6 +24291,7 @@ namespace Thetis
 
         private void btnMeterUp_Click(object sender, EventArgs e)
         {
+            if (chkLockContainer.Checked) return;
             MeterManager.clsMeter m = meterFromSelectedContainer();
             if (m == null) return;
 
@@ -24239,6 +24310,7 @@ namespace Thetis
 
         private void btnMeterDown_Click(object sender, EventArgs e)
         {
+            if (chkLockContainer.Checked) return;
             MeterManager.clsMeter m = meterFromSelectedContainer();
             if (m == null) return;
 
@@ -24605,6 +24677,7 @@ namespace Thetis
                 igs.EyeBezelScale = (float)nudLedIndicator_yOffset.Value;
                 igs.AttackRatio = (float)nudLedIndicator_xSize.Value;
                 igs.DecayRatio = (float)nudLedIndicator_ySize.Value;
+                igs.UpdateInterval = (int)nudLedIndicator_UpdateInterval.Value;
 
                 igs.Text1 = txtLedIndicator_condition.Text;
 
@@ -24619,6 +24692,9 @@ namespace Thetis
                 else if (radLed_light_pulsate.Checked)
                     igs.IgnoreHistoryDuration = 2;
                 // also showhistory + showtype are return states for valid/error
+
+                igs.SetSetting<bool>("led_notx_true", chkLed_notx_true.Checked);
+                igs.SetSetting<bool>("led_notx_false", chkLed_notx_false.Checked);
             }
             else if (mt == MeterType.TEXT_OVERLAY)
             {
@@ -25147,6 +25223,7 @@ namespace Thetis
                 nudLedIndicator_yOffset.Value = (decimal)igs.EyeBezelScale;
                 nudLedIndicator_xSize.Value = (decimal)igs.AttackRatio;
                 nudLedIndicator_ySize.Value = (decimal)igs.DecayRatio;
+                nudLedIndicator_UpdateInterval.Value = (decimal)igs.UpdateInterval;
 
                 txtLedIndicator_condition.Text = igs.Text1;
 
@@ -25166,6 +25243,9 @@ namespace Thetis
                         radLed_light_pulsate.Checked = true;
                         break;
                 }
+
+                chkLed_notx_true.Checked = igs.GetSetting<bool>("led_notx_true", false, false, false, false);
+                chkLed_notx_false.Checked = igs.GetSetting<bool>("led_notx_false", false, false, false, false);
 
                 updateLedIndicatorPanelControls();
                 updateLedValidControls();
@@ -28314,12 +28394,33 @@ namespace Thetis
                 fontDialog.Font = _textOverlayFont1;
                 if (fontDialog.ShowDialog() == DialogResult.OK)
                 {
+                    if (!isFontTrueType(fontDialog.Font)) return;
                     _textOverlayFont1 = fontDialog.Font;
                     updateMeterType();
                 }
             }
         }
+        public bool isFontTrueType(Font f)
+        {
+            try
+            {
+                FontFamily ff = new FontFamily(f.Name);
+            }
+            catch (ArgumentException e)
+            {
+                if (e.Message.Contains("TrueType", StringComparison.OrdinalIgnoreCase))
+                {
+                    MessageBox.Show("This font is not a TrueType font and can not be used.",                    
+                    "Font issue",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, Common.MB_TOPMOST);
+                    return false;
+                }                
 
+                return false;// also if not found
+            }
+            return true;
+        }
         private void btnTextOverlay_Font2_Click(object sender, EventArgs e)
         {
             using (FontDialog fontDialog = new FontDialog())
@@ -28327,6 +28428,7 @@ namespace Thetis
                 fontDialog.Font = _textOverlayFont2;
                 if (fontDialog.ShowDialog() == DialogResult.OK)
                 {
+                    if (!isFontTrueType(fontDialog.Font)) return;
                     _textOverlayFont2 = fontDialog.Font;
                     updateMeterType();
                 }
@@ -28906,6 +29008,14 @@ namespace Thetis
                     bool ok = int.TryParse(port, out int portInt);
                     if (ok)
                     {
+                        if(portInt < 0 || portInt > 65535) // bad port
+                        {
+                            MessageBox.Show("The port needs to be in the range 0-65535",
+                            "Listener Start Problem",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1, Common.MB_TOPMOST);
+                            return;
+                        }
                         if (check_same && (ip + ":" + portInt.ToString() == existing_ip_port)) return; // same as input, forget it
 
                         if (!MultiMeterIO.AlreadyConfigured(ip, portInt, type))
@@ -29764,6 +29874,14 @@ namespace Thetis
                 bool ok = int.TryParse(port, out int portInt);
                 if (ok)
                 {
+                    if (portInt < 0 || portInt > 65535) // bad port
+                    {
+                        MessageBox.Show("The port needs to be in the range 0-65535",
+                        "Listener Start Problem",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1, Common.MB_TOPMOST);
+                        return false;
+                    }
                     MultiMeterIO.clsMMIO mmio = MultiMeterIO.Data[mmioci.Guid];
                     mmio.UdpEndpointIP = ip;
                     mmio.UdpEndpointPort = portInt;
@@ -29786,6 +29904,14 @@ namespace Thetis
             {
                 if (int.TryParse(parts[1], out int intPort))
                 {
+                    if (intPort < 0 || intPort > 65535) // bad port
+                    {
+                        MessageBox.Show("The port needs to be in the range 0-65535",
+                        "Incorrect Format",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1, Common.MB_TOPMOST);
+                        return;
+                    }
                     if (Common.IsIpv4Valid(parts[0], intPort))
                     {
                         string oldIpPort = txtMMIO_network_udp_endpoint_ip_port.Text;
@@ -30122,8 +30248,9 @@ namespace Thetis
                 lblLed_Error.Visible = igs.ShowHistory;
                 lblLed_Valid.Text = igs.ShowType ? "Valid" : "Invalid";
                 lblLed_Valid.ForeColor = igs.ShowType ? Color.LimeGreen : Color.Red;
-            }
 
+                tmrLedValid.Enabled = true;
+            }            
         }
 
         private void chkLed_show_true_CheckedChanged(object sender, EventArgs e)
@@ -30173,6 +30300,14 @@ namespace Thetis
                 txtWebImage_url.Text.Contains("kc2g.com", StringComparison.InvariantCultureIgnoreCase)
                 )
             {
+                // for old bsdworld urls, insert -light or -dark
+                string bsd = fixBSDWorldUrls(txtWebImage_url.Text);
+                if (!string.IsNullOrEmpty(bsd))
+                {
+                    txtWebImage_url.Text = bsd;
+                    return;
+                }
+
                 // lock and set the update interval
                 nudWebImage_update_interval.Enabled = false;
                 _ignoreMeterItemChangeEvents = true;
@@ -30397,33 +30532,33 @@ namespace Thetis
         };
 
         private KeyValuePair<string, string>[] _bsdworld_urls =
-{
+        {
             new KeyValuePair<string, string>("select one", ""),
-            new KeyValuePair<string, string>("NA Propagation All", "https://bsdworld.org/DXCC/continent/NA/latest.webp"),
-            new KeyValuePair<string, string>("NA Propagation Zone 3", "https://bsdworld.org/DXCC/cqzone/3/latest.webp"),
-            new KeyValuePair<string, string>("NA Propagation Zone 4", "https://bsdworld.org/DXCC/cqzone/4/latest.webp"),
-            new KeyValuePair<string, string>("NA Propagation Zone 5", "https://bsdworld.org/DXCC/cqzone/5/latest.webp"),
-            new KeyValuePair<string, string>("EU Propagation All", "https://bsdworld.org/DXCC/continent/EU/tn_latest.webp"),
-            new KeyValuePair<string, string>("EU Propagation Zone 14", "https://bsdworld.org/DXCC/cqzone/14/latest.webp"),
-            new KeyValuePair<string, string>("EU Propagation Zone 15", "https://bsdworld.org/DXCC/cqzone/15/latest.webp"),
-            new KeyValuePair<string, string>("EU Propagation Zone 16", "https://bsdworld.org/DXCC/cqzone/16/latest.webp"),
-            new KeyValuePair<string, string>("EU Propagation Zone 20", "https://bsdworld.org/DXCC/cqzone/20/latest.webp"),
-            new KeyValuePair<string, string>("OC Propagation All", "https://bsdworld.org/DXCC/continent/OC/tn_latest.webp"),
-            new KeyValuePair<string, string>("AS Propagation All", "https://bsdworld.org/DXCC/continent/AS/tn_latest.webp"),
-            new KeyValuePair<string, string>("SA Propagation All", "https://bsdworld.org/DXCC/continent/SA/tn_latest.webp"),
-            new KeyValuePair<string, string>("AF Propagation All", "https://bsdworld.org/DXCC/continent/AF/tn_latest.webp"),
-            new KeyValuePair<string, string>("A-Index", "https://bsdworld.org/aindex.svgz"),
-            new KeyValuePair<string, string>("PK Index", "https://bsdworld.org/pkindex.svgz"),
-            new KeyValuePair<string, string>("PK Predictions", "https://bsdworld.org/pki-forecast.svgz"),
-            new KeyValuePair<string, string>("Flux", "https://bsdworld.org/flux.svgz"),
-            new KeyValuePair<string, string>("Outlook", "https://bsdworld.org/outlook.svgz"),
-            new KeyValuePair<string, string>("Solar Wind", "https://bsdworld.org/solarwind.svgz"),
-            new KeyValuePair<string, string>("SSN", "https://bsdworld.org/ssn.svgz"),
-            new KeyValuePair<string, string>("SSN History", "https://bsdworld.org/ssnhist.svgz"),
-            new KeyValuePair<string, string>("EISN", "https://bsdworld.org/eisn.svgz"),
-            new KeyValuePair<string, string>("Proton Flux", "https://bsdworld.org/proton_flux.svgz"),
-            new KeyValuePair<string, string>("X-Ray Flux", "https://bsdworld.org/xray_flux.svgz"),
-            new KeyValuePair<string, string>("D-Layer", "https://bsdworld.org/d-rap/latest.svgz"),
+            new KeyValuePair<string, string>("NA Propagation All", "https://bsdworld.org/DXCC/continent/NA/latest<light_mode>.webp"),
+            new KeyValuePair<string, string>("NA Propagation Zone 3", "https://bsdworld.org/DXCC/cqzone/3/latest<light_mode>.webp"),
+            new KeyValuePair<string, string>("NA Propagation Zone 4", "https://bsdworld.org/DXCC/cqzone/4/latest<light_mode>.webp"),
+            new KeyValuePair<string, string>("NA Propagation Zone 5", "https://bsdworld.org/DXCC/cqzone/5/latest<light_mode>.webp"),
+            new KeyValuePair<string, string>("EU Propagation All", "https://bsdworld.org/DXCC/continent/EU/tn_latest<light_mode>.webp"),
+            new KeyValuePair<string, string>("EU Propagation Zone 14", "https://bsdworld.org/DXCC/cqzone/14/latest<light_mode>.webp"),
+            new KeyValuePair<string, string>("EU Propagation Zone 15", "https://bsdworld.org/DXCC/cqzone/15/latest<light_mode>.webp"),
+            new KeyValuePair<string, string>("EU Propagation Zone 16", "https://bsdworld.org/DXCC/cqzone/16/latest<light_mode>.webp"),
+            new KeyValuePair<string, string>("EU Propagation Zone 20", "https://bsdworld.org/DXCC/cqzone/20/latest<light_mode>.webp"),
+            new KeyValuePair<string, string>("OC Propagation All", "https://bsdworld.org/DXCC/continent/OC/tn_latest<light_mode>.webp"),
+            new KeyValuePair<string, string>("AS Propagation All", "https://bsdworld.org/DXCC/continent/AS/tn_latest<light_mode>.webp"),
+            new KeyValuePair<string, string>("SA Propagation All", "https://bsdworld.org/DXCC/continent/SA/tn_latest<light_mode>.webp"),
+            new KeyValuePair<string, string>("AF Propagation All", "https://bsdworld.org/DXCC/continent/AF/tn_latest<light_mode>.webp"),
+            new KeyValuePair<string, string>("A-Index", "https://bsdworld.org/aindex<light_mode>.svgz"),
+            new KeyValuePair<string, string>("PK Index", "https://bsdworld.org/pkindex<light_mode>.svgz"),
+            new KeyValuePair<string, string>("PK Predictions", "https://bsdworld.org/pki-forecast<light_mode>.svgz"),
+            new KeyValuePair<string, string>("Flux", "https://bsdworld.org/flux<light_mode>.svgz"),
+            new KeyValuePair<string, string>("Outlook", "https://bsdworld.org/outlook<light_mode>.svgz"),
+            new KeyValuePair<string, string>("Solar Wind", "https://bsdworld.org/solarwind<light_mode>.svgz"),
+            new KeyValuePair<string, string>("SSN", "https://bsdworld.org/ssn<light_mode>.svgz"),
+            new KeyValuePair<string, string>("SSN History", "https://bsdworld.org/ssnhist<light_mode>.svgz"),
+            new KeyValuePair<string, string>("EISN", "https://bsdworld.org/eisn<light_mode>.svgz"),
+            new KeyValuePair<string, string>("Proton Flux", "https://bsdworld.org/proton_flux<light_mode>.svgz"),
+            new KeyValuePair<string, string>("X-Ray Flux", "https://bsdworld.org/xray_flux<light_mode>.svgz"),
+            new KeyValuePair<string, string>("D-Layer", "https://bsdworld.org/d-rap/latest<light_mode>.svgz"),
         };
 
         private KeyValuePair<string, string>[] _nasa_urls =
@@ -30450,6 +30585,26 @@ namespace Thetis
             new KeyValuePair<string, string>("D Region Absorption Map", "https://services.swpc.noaa.gov/images/animations/d-rap/global/d-rap/latest.png")
         };
 
+        private string fixBSDWorldUrls(string url)
+        {
+            if (!url.Contains("bsdworld.org", StringComparison.OrdinalIgnoreCase)) return "";
+            if (url.Contains("-light", StringComparison.OrdinalIgnoreCase) || url.Contains("-dark", StringComparison.OrdinalIgnoreCase)) return "";
+            if (!_bsdworld_urls.Any(kvp => (url.Replace("<light_mode>", "")).Contains((kvp.Value).Replace("<light_mode>", "")))) return ""; // the url passed is not in _bsdworld_urls
+
+            // insert before .webp or .svgz
+            string mode = chkBSDWorldDarkMode.Checked ? "-dark" : "-light";
+            int pos = url.IndexOf(".webp");
+            if (pos != -1)
+            {
+                return url.Replace(".webp", $"{mode}.webp");
+            }
+            pos = url.IndexOf(".svgz");
+            if (pos != -1)
+            {
+                return url.Replace(".svgz", $"{mode}.svgz");
+            }
+            return "";
+        }
         private void comboWebImage_BsdWorld_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (initializing) return;
@@ -30457,7 +30612,8 @@ namespace Thetis
             if (comboWebImage_BsdWorld.SelectedIndex == 0) return;
 
             KeyValuePair<string, string> kvp = _bsdworld_urls[comboWebImage_BsdWorld.SelectedIndex];
-            txtWebImage_url.Text = kvp.Value;
+            string url = kvp.Value.Replace("<light_mode>", chkBSDWorldDarkMode.Checked ? "-dark" : "-light");
+            txtWebImage_url.Text = url;
 
             comboWebImage_BsdWorld.SelectedIndex = 0;
         }
@@ -30619,6 +30775,7 @@ namespace Thetis
                 fontDialog.Font = _bandButtons_font;
                 if (fontDialog.ShowDialog() == DialogResult.OK)
                 {
+                    if (!isFontTrueType(fontDialog.Font)) return;
                     _bandButtons_font = fontDialog.Font;
                     updateMeterType();
                 }
@@ -31010,6 +31167,125 @@ namespace Thetis
         }
 
         private void clrbtnHistory_time_Changed(object sender, EventArgs e)
+        {
+            updateMeterType();
+        }
+
+        private void btnGetMonitorHz_Click(object sender, EventArgs e)
+        {
+            if (console == null) return;
+            udDisplayFPS.Value = (decimal)Display.GetCurrentMonitorRefreshRate(console);
+        }
+
+        private void chkLockContainer_CheckedChanged(object sender, EventArgs e)
+        {
+            if (initializing) return;
+            clsContainerComboboxItem cci = (clsContainerComboboxItem)comboContainerSelect.SelectedItem;
+            if (cci != null)
+            {
+                MeterManager.LockContainer(cci.ID, chkLockContainer.Checked);
+                btnContainerDelete.Enabled = !chkLockContainer.Checked;
+                btnAddMeterItem.Enabled = !chkLockContainer.Checked;
+                btnRemoveMeterItem.Enabled = !chkLockContainer.Checked;
+                btnMeterUp.Enabled = !chkLockContainer.Checked;
+                btnMeterDown.Enabled = !chkLockContainer.Checked;
+            }
+        }
+        public void SetupCMAsio(bool show_cmasioconfig)
+        {
+            if (!show_cmasioconfig)
+            {
+                tcAudio.TabPages.Remove(tpCMAsio);
+                return;
+            }
+
+            comboASIODevicesAvailable.Items.Clear();
+
+            txtCurrentAsioDevice.Text = CMASIOConfig.GetASIOdrivername();
+            nudAsioBlockNum.Value = (decimal)CMASIOConfig.GetASIOblocknum();
+            chkAsioLockMode.Checked = CMASIOConfig.GetASIOlockmode();
+
+            //the ASIO driver in use wont be in the list, lets add it
+            if (!string.IsNullOrEmpty(txtCurrentAsioDevice.Text)) 
+                comboASIODevicesAvailable.Items.Add(txtCurrentAsioDevice.Text);
+
+            comboASIODevicesAvailable.Items.AddRange(CMASIOConfig.GetASIODevices().ToArray());
+
+            if (comboASIODevicesAvailable.Items.Count == 0)
+            {
+                comboASIODevicesAvailable.Items.Add("None Available");
+            }
+
+            setCMasioControls(!string.IsNullOrEmpty(txtCurrentAsioDevice.Text));
+        }
+
+        private void btnCMASIOActive_Click(object sender, EventArgs e)
+        {
+            string selected = comboASIODevicesAvailable.SelectedItem.ToString();
+            if (selected == "None Available") return;
+            if (string.IsNullOrEmpty(selected)) return;
+
+            CMASIOConfig.SetASIOdrivername(selected);
+            setCMasioControls(true);
+            updateCMAsioInfo();
+        }
+
+        private void btnCMASIODisable_Click(object sender, EventArgs e)
+        {
+            CMASIOConfig.SetASIOdrivername("");
+            updateCMAsioInfo();
+        }
+        private void setCMasioControls(bool enabled)
+        {
+            nudAsioBlockNum.Enabled = enabled;
+            chkAsioLockMode.Enabled = enabled;
+            nudAsioBlockNum.Enabled = enabled;
+            btnCMAsioDefaultBlockNum.Enabled = enabled;
+        }
+        private void nudAsioBlockNum_ValueChanged(object sender, EventArgs e)
+        {
+            if (initializing) return;
+            CMASIOConfig.SetASIOblocknum((int)nudAsioBlockNum.Value, chkAsioLockMode.Checked);
+            updateCMAsioInfo();
+        }
+
+        private void comboASIODevicesAvailable_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (initializing) return;
+        }
+
+        private void chkAsioLockMode_CheckedChanged(object sender, EventArgs e)
+        {
+            if (initializing) return;
+            CMASIOConfig.SetASIOblocknum((int)nudAsioBlockNum.Value, chkAsioLockMode.Checked);
+            updateCMAsioInfo();
+        }
+
+        private void btnCMAsioDefaultBlockNum_Click(object sender, EventArgs e)
+        {
+            nudAsioBlockNum.Value = 5;
+        }
+        private void updateCMAsioInfo()
+        {
+            lblCMAsioInfo.Text = "Settings updated. Restart to take effect.";
+            lblCMAsioInfo.Visible = true;
+        }
+        private void tmrLedValid_Tick(object sender, EventArgs e)
+        {
+            if (!txtLedIndicator_condition.Visible) tmrLedValid.Enabled = false;
+            updateLedValidControls();
+        }
+
+        private void chkLed_notx_true_CheckedChanged(object sender, EventArgs e)
+        {
+            updateMeterType();
+        }
+
+        private void chkLed_notx_false_CheckedChanged(object sender, EventArgs e)
+        {
+            updateMeterType();
+        }
+        private void nudLedIndicator_UpdateInterval_ValueChanged(object sender, EventArgs e)
         {
             updateMeterType();
         }
