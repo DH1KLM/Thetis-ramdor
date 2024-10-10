@@ -121,7 +121,6 @@ namespace Thetis
             udDisplayFPS.Maximum = Console.MAX_FPS;
 
             Skin.SetConsole(console);
-            openFileDialog1.InitialDirectory = console.AppDataPath;
 
 #if(!DEBUG)
             comboGeneralProcessPriority.Items.Remove("Idle");
@@ -649,8 +648,6 @@ namespace Thetis
 
             console.specRX.GetSpecRX(0).Update = true;
             console.specRX.GetSpecRX(1).Update = true;
-
-            openFileDialog1.Filter = "Thetis Database Files (*.xml) | *.xml";
 
             btnRX2PBsnr.Enabled = console.RX2Enabled; //MW0LGE [2.9.0.7]
 
@@ -1637,6 +1634,20 @@ namespace Thetis
             DB.RemoveVarsList("Options", _oldSettings);
             _oldSettings.Clear();
         }
+        private void addToIgnore(ref List<string>controlNames, Control rootControl)
+        {
+            if(rootControl == null)return;
+
+            if (!controlNames.Contains(rootControl.Name) && !string.IsNullOrEmpty(rootControl.Name))
+            {
+                controlNames.Add(rootControl.Name);
+            }
+
+            foreach(Control childControl in rootControl.Controls)
+            {
+                addToIgnore(ref controlNames,childControl);
+            }
+        }
         private bool _gettingOptions = false;
         private void getOptions(List<string> recoveryList = null)
         {
@@ -1674,6 +1685,40 @@ namespace Thetis
             }
 
             if (sortedList.Contains("comboPAProfile")) sortedList.Remove("comboPAProfile"); // this is done after the PA profiles are recovered // MW0LGE_22b
+
+            // remove any that will be set by clicking on related item
+            List<string> ignoreList = new List<string>();
+            addToIgnore(ref ignoreList, tpMultiMetersIO);
+            addToIgnore(ref ignoreList, tpAppearanceMeter2);
+            addToIgnore(ref ignoreList, grpMultiMeterHolder);
+            addToIgnore(ref ignoreList, pnlMMIO_network_container);
+
+            addToIgnore(ref ignoreList, txtVAC1OldVarIn);
+            addToIgnore(ref ignoreList, txtVAC1OldVarOut);
+            addToIgnore(ref ignoreList, txtVAC2OldVarIn);
+            addToIgnore(ref ignoreList, txtVAC2OldVarOut);
+
+            addToIgnore(ref ignoreList, grpHistoryItem);
+            addToIgnore(ref ignoreList, grpWebImage);
+            addToIgnore(ref ignoreList, grpTextOverlay);
+            addToIgnore(ref ignoreList, grpMeterItemClockSettings);
+            addToIgnore(ref ignoreList, grpMeterItemSpacerSettings);
+            addToIgnore(ref ignoreList, grpBandButtons);
+            addToIgnore(ref ignoreList, ucTunestepOptionsGrid_buttons);
+            addToIgnore(ref ignoreList, pnlButtonBox_antenna_toggles);
+            addToIgnore(ref ignoreList, grpLedIndicator);
+            addToIgnore(ref ignoreList, grpMeterItemDataOutNode);
+            addToIgnore(ref ignoreList, grpMeterItemVfoDisplaySettings);
+            addToIgnore(ref ignoreList, grpMeterItemRotator);
+            addToIgnore(ref ignoreList, grpMeterItemSettings);
+
+            addToIgnore(ref ignoreList, grpGainByBandPA);
+
+            foreach (string key in ignoreList)
+            {
+                if(sortedList.Contains(key)) sortedList.Remove(key);
+            }
+            //
 
             foreach (string sKey in sortedList)
             {
@@ -12290,16 +12335,6 @@ namespace Thetis
         {
             console.WheelTunesVFOB = chkWheelTuneVFOB.Checked;
         }
-
-        private void btnExportDB_Click(object sender, EventArgs e)
-        {
-        }
-
-        private void saveFileDialog1_FileOk(object sender, CancelEventArgs e)
-        {
-            DB.WriteDB(saveFileDialog1.FileName);
-        }
-
         private void chkPennyLane_CheckedChanged(object sender, System.EventArgs e)
         {
         }
@@ -31191,9 +31226,23 @@ namespace Thetis
                 btnMeterDown.Enabled = !chkLockContainer.Checked;
             }
         }
-        public void SetupCMAsio(bool show_cmasioconfig)
+        public void SetupCMAsio(bool pa_issue, bool cmasio_config_flag)
         {
-            if (!show_cmasioconfig)
+            // for these callsigns always show cmasio tab
+            List<string> callsign_ignore = new List<string>() { "mw0lge", "m0lge", "oe3ide" };
+
+            bool ignore = false;
+            foreach (string call in callsign_ignore)
+            {
+                string tmp;
+                tmp = txtGenCustomTitle == null || txtGenCustomTitle.Text == null ? "" : txtGenCustomTitle.Text;
+                ignore |= tmp.Contains(call, StringComparison.OrdinalIgnoreCase);
+
+                tmp = txtOwnCallsign == null || txtOwnCallsign.Text == null ? "" : txtOwnCallsign.Text;
+                ignore |= tmp.Contains(call, StringComparison.OrdinalIgnoreCase);
+            }
+
+            if (pa_issue || (!cmasio_config_flag && !ignore))
             {
                 tcAudio.TabPages.Remove(tpCMAsio);
                 return;
