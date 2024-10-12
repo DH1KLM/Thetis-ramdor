@@ -1388,12 +1388,13 @@ namespace Thetis
 
         private void tbRX1Atten_Scroll(object sender, EventArgs e)
         {
-            console.SetupForm.ATTOnRX1 = tbRX1Atten.Value;
+            console.SetupForm.HermesAttenuatorData = tbRX1Atten.Value; //DH1KLM keep from dev_4 for Red Pitaya ATT
         }
 
         private void tbRX2Atten_Scroll(object sender, EventArgs e)
         {
-            console.SetupForm.ATTOnRX2 = tbRX2Atten.Value; //MW0LGE_21d step atten
+            //console.RX2ATT = tbRX2Atten.Value;
+            console.SetupForm.HermesAttenuatorDataRX2 = tbRX1Atten.Value; //DH1KLM keep from dev_4 for Red Pitaya ATT //MW0LGE_21d step atten
         }
 
         private void chkRX1Mute_CheckedChanged(object sender, EventArgs e)
