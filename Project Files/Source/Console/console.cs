@@ -2625,7 +2625,7 @@ namespace Thetis
 
             a.Remove("udRX1StepAttData/" + udRX1StepAttData.Value.ToString());
             a.Remove("udRX2StepAttData/" + udRX2StepAttData.Value.ToString());
-            a.Remove("udTXStepAttData/" + udTXStepAttData.Value.ToString()); //[2.3.6.10]MW0LGE            
+            // a.Remove("udTXStepAttData/" + udTXStepAttData.Value.ToString()); //[2.3.6.10]MW0LGE            
 
             a.Add("last_radio_protocol/" + Audio.LastRadioProtocol.ToString()); // MW0LGE [2.9.0.8] used incase protocol changes from last time. Used in audio.cs tp reset PS feedback level
             a.Add("last_radio_hardware/" + Audio.LastRadioHardware.ToString()); // as above, but hardware related
@@ -7638,11 +7638,12 @@ namespace Thetis
                     {
                         if (diversity2)
                         {
-                            P1_DDCConfig =
+                            P1_DDCConfig = 2; // Pavel for Red Pitaya
                             DDCEnable = DDC0;
                             SyncEnable = DDC1;
                             Rate[0] = rx1_rate;
                             Rate[1] = rx1_rate;
+                            Rate[2] = rx1_rate; // Pavel for Red Pitaya
                             cntrl1 = rx_adc_ctrl1 & 0xff;
                             cntrl2 = rx_adc_ctrl2 & 0x3f;
                         }
@@ -7651,6 +7652,8 @@ namespace Thetis
                             P1_DDCConfig = 1;
                             DDCEnable = DDC2;
                             SyncEnable = 0;
+                            Rate[0] = rx1_rate; // Pavel for Red Pitaya
+                            Rate[1] = rx1_rate; // Pavel for Red Pitaya
                             Rate[2] = rx1_rate;
                             cntrl1 = rx_adc_ctrl1 & 0xff;
                             cntrl2 = rx_adc_ctrl2 & 0x3f;
@@ -7663,6 +7666,8 @@ namespace Thetis
                             P1_DDCConfig = 1;
                             DDCEnable = DDC2;
                             SyncEnable = 0;
+                            Rate[0] = rx1_rate; // Pavel for Red Pitaya
+                            Rate[1] = rx1_rate; // Pavel for Red Pitaya
                             Rate[2] = rx1_rate;
                             cntrl1 = rx_adc_ctrl1 & 0xff;
                             cntrl2 = rx_adc_ctrl2 & 0x3f;
@@ -7696,6 +7701,7 @@ namespace Thetis
                             SyncEnable = DDC1;
                             Rate[0] = rx1_rate;
                             Rate[1] = rx1_rate;
+                            Rate[2] = rx1_rate; // Pavel for Red Pitaya
                             cntrl1 = rx_adc_ctrl1 & 0xff;
                             cntrl2 = rx_adc_ctrl2 & 0x3f;
                         }
