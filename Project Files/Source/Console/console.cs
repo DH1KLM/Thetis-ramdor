@@ -1970,7 +1970,9 @@ namespace Thetis
                 infoBar.UpdateButtonState(ucInfoBar.ActionTypes.Leveler, SetupForm.TXLevelerOn, false);
                 infoBar.UpdateButtonState(ucInfoBar.ActionTypes.CFCeq, SetupForm.CFCPEQEnabled, false);
                 infoBar.UpdateButtonState(ucInfoBar.ActionTypes.ShowSpots, SetupForm.ShowTCISpots /*| other spots*/, false);
-                infoBar.UpdateButtonState(ucInfoBar.ActionTypes.DisplayFill, SetupForm.DisplayPanFill, true); // <- last one needs to be true
+                infoBar.UpdateButtonState(ucInfoBar.ActionTypes.DisplayFill, SetupForm.DisplayPanFill, false); // 
+                infoBar.UpdateButtonState(ucInfoBar.ActionTypes.Random, SetupForm.RandomOn, false); // DH1KLM for Red Pitaya
+                infoBar.UpdateButtonState(ucInfoBar.ActionTypes.Dither, SetupForm.DitherOn, true); // <- last one needs to be true // DH1KLM for Red Pitaya
             }
 
             // tooltips
@@ -9285,11 +9287,11 @@ namespace Thetis
 
             VFOAFreq = freq;									// set VFOA frequency
 
-            bool step_attnRX1 = SetupForm.RX1EnableAtt;
+            bool step_attn = SetupForm.HermesEnableAttenuator; //DH1KLM keep from dev_4 for Red Pitaya ATT
             bool step_attnRX2 = SetupForm.RX2EnableAtt; //MW0LGE_[2.9.0.6]
-            SetupForm.RX1EnableAtt = false;
+            SetupForm.HermesEnableAttenuator = false; //DH1KLM keep from dev_4 for Red Pitaya ATT
             SetupForm.RX2EnableAtt = false; //MW0LGE_[2.9.0.6]
-            PreampMode preampRX1 = RX1PreampMode;				// save current preamp mode
+            PreampMode preamp = RX1PreampMode; //DH1KLM keep from dev_4 for Red Pitaya ATT // save current preamp mode 
             PreampMode preampRX2 = RX2PreampMode;				// save current preamp mode
             RX1PreampMode = PreampMode.HPSDR_ON;			// set to high
             RX2PreampMode = PreampMode.HPSDR_ON;        //MW0LGE_[2.9.0.6]
@@ -9607,11 +9609,9 @@ namespace Thetis
             chkRIT.Checked = rit_on;							// restore RIT on
             udRIT.Value = rit_val;								// restore RIT value
 
-            chkFWCATU.Checked = ctun_on;
-
-            RX1PreampMode = preampRX1;					        	// restore preamp value
-            RX2PreampMode = preampRX2;					        	// restore preamp value MW0LGE_[2.9.0.6]
-            SetupForm.RX1EnableAtt = step_attnRX1;
+            RX1PreampMode = preamp; //DH1KLM keep from dev_4 for Red Pitaya ATT // restore preamp value
+            RX2PreampMode = preampRX2;		                                 	// restore preamp value MW0LGE_[2.9.0.6]
+            SetupForm.HermesEnableAttenuator = step_attn; //DH1KLM keep from dev_4 for Red Pitaya ATT
             SetupForm.RX2EnableAtt = step_attnRX2;   //MW0LGE_[2.9.0.6] 
 
             RX1DSPMode = dsp_mode;						    	// restore DSP mode
@@ -10272,22 +10272,12 @@ namespace Thetis
                 tx_attenuator_data = value;
                 if (!initializing)
                 {
-                    setTXstepAttenuatorForBand(tx_band, tx_attenuator_data); //[2.10.3.6]MW0LGE att_fixes #399
-                    if (m_bAttontx)
-                    {
-                        int txatt = getTXstepAttenuatorForBand(tx_band);
-                        NetworkIO.SetTxAttenData(txatt); //[2.10.3.6]MW0LGE att_fixes
-                        Display.TXAttenuatorOffset = txatt; //[2.10.3.6]MW0LGE att_fixes
-                    }
-                    else
-                    {
-                        NetworkIO.SetTxAttenData(0);
-                        Display.TXAttenuatorOffset = 0;
-                    }
+                    setTXstepAttenuatorForBand(rx1_band, tx_attenuator_data); //TX-ATT DH1KLM keep from dev_4 for Red Pitaya ATT
+                    if (m_bAttontx) NetworkIO.SetTxAttenData(getTXstepAttenuatorForBand(rx1_band));
+                    else NetworkIO.SetTxAttenData(0);
 
-                    //if (m_bAttontx && _mox) //[2.10.3.6]MW0LGE att_fixes
-                    //udRX1StepAttData.Value = value; //[2.10.3.6]MW0LGE att_fixes
-                    udTXStepAttData.Value = value;
+                    if (m_bAttontx && _mox) //TX-ATT DH1KLM keep from dev_4 for Red Pitaya ATT
+                        udRX1StepAttData.Value = value;
                 }
                 _updatingTxAtt = false;
             }
@@ -10555,18 +10545,21 @@ namespace Thetis
                 rx1_step_att_present = value;
                 if (rx1_step_att_present)
                 {
-                    udRX1StepAttData.Value = getRX1stepAttenuatorForBand(rx1_band); //MW0LGE [2.10.3.6] added
+                    lblPreamp.Text = "S-ATT"; //DH1KLM keep from dev_4 for Red Pitaya ATT
+                    udRX1StepAttData.BringToFront(); //DH1KLM keep from dev_4 for Red Pitaya ATT
                     udRX1StepAttData_ValueChanged(this, EventArgs.Empty);
                 }
                 else
                 {
+                    lblPreamp.Text = "ATT"; //DH1KLM keep from dev_4 for Red Pitaya ATT
+                    comboPreamp.BringToFront(); //DH1KLM keep from dev_4 for Red Pitaya ATT
                     comboPreamp_SelectedIndexChanged(this, EventArgs.Empty);
 
                     if (alexpresent)
                         NetworkIO.SetAlexAtten(alex_atten); // normal up alex attenuator setting
                 }
 
-                updateAttNudsCombos();
+                //updateAttNudsCombos();
 
                 if (!_mox)
                 {
@@ -10655,7 +10648,7 @@ namespace Thetis
                         if (((nRX1ADCinUse == nRX2ADCinUse) || bRX1RX2diversity) && RX2AttenuatorData != rx1_attenuator_data)
                         {
                             _setFromOtherAttenuator = true;
-                            if (SetupForm.RX2EnableAtt != SetupForm.RX1EnableAtt) SetupForm.RX2EnableAtt = SetupForm.RX1EnableAtt;
+                            if (SetupForm.RX2EnableAtt != SetupForm.HermesEnableAttenuator) SetupForm.RX2EnableAtt = SetupForm.HermesEnableAttenuator;//DH1KLM keep from dev_4 for Red Pitaya ATT
                             RX2AttenuatorData = rx1_attenuator_data;
                             _setFromOtherAttenuator = false;
                         }
@@ -10689,16 +10682,25 @@ namespace Thetis
                 {
                     if (rx2_step_att_present)
                     {
+                        lblRX2Preamp.Visible = true; //DH1KLM keep from old version for Red Pitaya ATT
+                        udRX2StepAttData.Visible = true; //DH1KLM keep from dev_4 for Red Pitaya ATT
+                        lblRX2Preamp.Text = "S-ATT"; //DH1KLM keep from dev_4 for Red Pitaya ATT
+                        udRX2StepAttData.BringToFront(); //DH1KLM keep from dev_4 for Red Pitaya ATT
+                        //udRX2StepAttData.Value = rx2_step_attenuator_by_band[(int)rx2_band];
                         udRX2StepAttData.Value = getRX2stepAttenuatorForBand(rx2_band);
                         udRX2StepAttData_ValueChanged(this, EventArgs.Empty);
                     }
                     else
                     {
+                        lblRX2Preamp.Visible = true; //DH1KLM keep from dev_4 for Red Pitaya ATT
+                        lblRX2Preamp.Text = "ATT"; //DH1KLM keep from dev_4 for Red Pitaya ATT
+                        comboRX2Preamp.Visible = true; //DH1KLM keep from dev_4 for Red Pitaya ATT
+                        comboRX2Preamp.BringToFront(); //DH1KLM keep from dev_4 for Red Pitaya ATT
                         comboRX2Preamp_SelectedIndexChanged(this, EventArgs.Empty);
                     }
                 }
 
-                updateAttNudsCombos();
+                //updateAttNudsCombos();
 
                 if (!_mox)
                 {
@@ -10797,7 +10799,7 @@ namespace Thetis
                         if (((nRX1ADCinUse == nRX2ADCinUse) || bRX1RX2diversity) && RX1AttenuatorData != rx2_attenuator_data)
                         {
                             _setFromOtherAttenuator = true;
-                            if (SetupForm.RX1EnableAtt != SetupForm.RX2EnableAtt) SetupForm.RX1EnableAtt = SetupForm.RX2EnableAtt;
+                            if (SetupForm.HermesEnableAttenuator != SetupForm.RX2EnableAtt) SetupForm.HermesEnableAttenuator = SetupForm.RX2EnableAtt; //DH1KLM keep from dev_4 for Red Pitaya ATT
                             RX1AttenuatorData = rx2_attenuator_data;
                             _setFromOtherAttenuator = false;
                         }
@@ -16817,15 +16819,12 @@ namespace Thetis
                     // save values for old band
                     rx1_agcm_by_band[(int)old_band] = (AGCMode)comboAGC.SelectedIndex;
                     rx1_agct_by_band[(int)old_band] = ptbRF.Value;
-                    SetupForm.ATTOnTX = getTXstepAttenuatorForBand(tx_band); //[2.10.3.6]MW0LGE att_fixes
-                    RX1PreampMode = rx1_preamp_by_band[(int)rx1_band];
-                    RX1AttenuatorData = getRX1stepAttenuatorForBand(rx1_band);
-                    //[2.10.3.6]MW0LGE this tmp is needed because RX1AGCMode causes an update to the setup form
-                    //with the current max value for AGC (depending on agcmode) if the agcmode selected index changes
-                    //which in turn sets RF again
-                    int tmp = rx1_agct_by_band[(int)rx1_band];
-                    RX1AGCMode = rx1_agcm_by_band[(int)rx1_band];
-                    RF = tmp;
+                    SetupForm.ATTOnTX = getTXstepAttenuatorForBand(value); //DH1KLM keep from dev_4 for Red Pitaya ATT
+                    RX1PreampMode = rx1_preamp_by_band[(int)value];
+                    //RX1AttenuatorData = rx1_step_attenuator_by_band[(int)value]; //DH1KLM keep from dev_4 for Red Pitaya ATT
+                    RX1AttenuatorData = getRX1stepAttenuatorForBand(value); //DH1KLM keep from dev_4 for Red Pitaya ATT
+                    RX1AGCMode = rx1_agcm_by_band[(int)value];
+                    RF = rx1_agct_by_band[(int)value]; //DH1KLM keep from dev_4 for Red Pitaya ATT
 
                     //================================================================================           
                     // ke9ns ADD for use by scanner so it knows which band button your on currently
@@ -16991,11 +16990,11 @@ namespace Thetis
                     rx2_agcm_by_band[(int)old_band] = (AGCMode)comboRX2AGC.SelectedIndex;
                     rx2_agct_by_band[(int)old_band] = ptbRX2RF.Value;
 
-                    RX2PreampMode = rx2_preamp_by_band[(int)rx2_band];
-                    RX2AttenuatorData = getRX2stepAttenuatorForBand(rx2_band);
-                    int tmp = rx2_agct_by_band[(int)rx2_band]; //[2.10.3.6]MW0LGE see comment in RX1Band
-                    RX2AGCMode = rx2_agcm_by_band[(int)rx2_band];
-                    RX2RF = tmp;
+                    RX2PreampMode = rx2_preamp_by_band[(int)value];
+                    //RX2AttenuatorData = rx2_step_attenuator_by_band[(int)value]; //DH1KLM keep from dev_4 for Red Pitaya ATT
+                    RX2AttenuatorData = getRX2stepAttenuatorForBand(value); //DH1KLM keep from dev_4 for Red Pitaya ATT
+                    RX2AGCMode = rx2_agcm_by_band[(int)value];
+                    RX2RF = rx2_agct_by_band[(int)value]; //DH1KLM keep from dev_4 for Red Pitaya ATT
 
                     repopulateForms();
 
@@ -18582,21 +18581,12 @@ namespace Thetis
             set
             {
                 m_bAttontx = value;
-                updateAttNudsCombos();
+                //updateAttNudsCombos();
 
                 if (PowerOn)
                 {
-                    if (m_bAttontx)
-                    {
-                        int txatt = getTXstepAttenuatorForBand(tx_band);
-                        NetworkIO.SetTxAttenData(txatt); //[2.10.3.6]MW0LGE att_fixes
-                        Display.TXAttenuatorOffset = txatt; //[2.10.3.6]MW0LGE att_fixes
-                    }
-                    else
-                    {
-                        NetworkIO.SetTxAttenData(0);
-                        Display.TXAttenuatorOffset = 0;
-                    }
+                    if (m_bAttontx) NetworkIO.SetTxAttenData(getTXstepAttenuatorForBand(rx1_band)); //TX-ATT DH1KLM keep from dev_4 for Red Pitaya ATT
+                    else NetworkIO.SetTxAttenData(0);
                 }
 
             }
@@ -18893,7 +18883,7 @@ namespace Thetis
                     if (((nRX1ADCinUse == nRX2ADCinUse) || bRX1RX2diversity) && RX2PreampMode != rx1_preamp_mode)
                     {
                         _setFromOtherAttenuator = true;
-                        if (SetupForm.RX2EnableAtt != SetupForm.RX1EnableAtt) SetupForm.RX2EnableAtt = SetupForm.RX1EnableAtt;
+                        if (SetupForm.RX2EnableAtt != SetupForm.HermesEnableAttenuator) SetupForm.RX2EnableAtt = SetupForm.HermesEnableAttenuator; //DH1KLM keep from dev_4 for Red Pitaya ATT
                         RX2PreampMode = rx1_preamp_mode;
                         _setFromOtherAttenuator = false;
                     }
@@ -19002,7 +18992,7 @@ namespace Thetis
                     if (((nRX1ADCinUse == nRX2ADCinUse) || bRX1RX2diversity) && RX1PreampMode != rx2_preamp_mode)
                     {
                         _setFromOtherAttenuator = true;
-                        if (SetupForm.RX1EnableAtt != SetupForm.RX2EnableAtt) SetupForm.RX1EnableAtt = SetupForm.RX2EnableAtt;
+                        if (SetupForm.HermesEnableAttenuator != SetupForm.RX2EnableAtt) SetupForm.HermesEnableAttenuator = SetupForm.RX2EnableAtt; //DH1KLM keep from dev_4 for Red Pitaya ATT
                         RX1PreampMode = rx2_preamp_mode;
                         _setFromOtherAttenuator = false;
                     }
@@ -24338,12 +24328,12 @@ namespace Thetis
         {
             while (chkPower.Checked)
             {
-                if (!_mox)
-                {
-                    float rx1PreampOffset;
-                    if (rx1_step_att_present) rx1PreampOffset = (float)rx1_attenuator_data;
-                    else rx1PreampOffset = rx1_preamp_offset[(int)rx1_preamp_mode];
+                float rx1PreampOffset; //DH1KLM keep from dev_4 for Red Pitaya ATT
+                if (rx1_step_att_present) rx1PreampOffset = (float)rx1_attenuator_data; //DH1KLM keep from dev_4 for Red Pitaya ATT
+                else rx1PreampOffset = rx1_preamp_offset[(int)rx1_preamp_mode]; //DH1KLM keep from dev_4 for Red Pitaya ATT
 
+                if (!_mox) //DH1KLM keep from dev_4 for Red Pitaya ATT
+                {
                     float num = WDSP.CalculateRXMeter(0, 0, WDSP.MeterType.SIGNAL_STRENGTH);
                     num = num +
                     rx1_meter_cal_offset +
@@ -24746,8 +24736,8 @@ namespace Thetis
                 {
                     update_preamp_mutex = true;
 
-                    SetupForm.RX1EnableAtt = old_satt;
-                    SetupForm.ATTOnRX1 = old_satt_data;
+                    SetupForm.HermesEnableAttenuator = old_satt; //DH1KLM keep from dev_4 for Red Pitaya ATT
+                    SetupForm.HermesAttenuatorData = old_satt_data; //DH1KLM keep from dev_4 for Red Pitaya ATT
                     RX1PreampMode = preamp;
 
                     if (current_hpsdr_model == HPSDRModel.ANAN100D ||
@@ -24759,7 +24749,7 @@ namespace Thetis
                         current_hpsdr_model == HPSDRModel.ANAN_G2_1K)
                     {
                         SetupForm.RX2EnableAtt = old_rx2_satt;
-                        SetupForm.ATTOnRX2 = old_rx2_satt_data; //MW0LGE_21d atten
+                        SetupForm.HermesAttenuatorDataRX2 = old_rx2_satt_data; //DH1KLM keep from dev_4 for Red Pitaya ATT //MW0LGE_21d atten 
                         RX2PreampMode = rx2_preamp;
                     }
                     update_preamp_mode = false;
@@ -24770,7 +24760,7 @@ namespace Thetis
                 if (update_preamp && !update_preamp_mutex)
                 {
                     old_satt = rx1_step_att_present;
-                    old_satt_data = SetupForm.ATTOnRX1;
+                    old_satt_data = SetupForm.HermesAttenuatorData; //DH1KLM keep from dev_4 for Red Pitaya ATT
                     preamp = RX1PreampMode;				// save current preamp mode
 
                     if (current_hpsdr_model == HPSDRModel.ANAN100D ||
@@ -24782,7 +24772,7 @@ namespace Thetis
                         current_hpsdr_model == HPSDRModel.ANAN_G2_1K)
                     {
                         old_rx2_satt = SetupForm.RX2EnableAtt;
-                        old_rx2_satt_data = SetupForm.ATTOnRX2;// MW0LGE_21d atten          rx2_attenuator_data;// RX2AttenuatorData;
+                        old_rx2_satt_data = SetupForm.HermesAttenuatorDataRX2; //DH1KLM keep from dev_4 for Red Pitaya ATT // MW0LGE_21d atten rx2_attenuator_data;// RX2AttenuatorData;
                         rx2_preamp = RX2PreampMode;
                     }
                     update_preamp = false;
@@ -26499,17 +26489,8 @@ namespace Thetis
                 Thread.Sleep(100); // wait for hardware to settle before starting audio (possible sample rate change)
                 psform.ForcePS();
 
-                if (m_bAttontx)
-                {
-                    int txatt = getTXstepAttenuatorForBand(tx_band);
-                    NetworkIO.SetTxAttenData(txatt); //[2.10.3.6]MW0LGE att_fixes
-                    Display.TXAttenuatorOffset = txatt;
-                }
-                else
-                {
-                    NetworkIO.SetTxAttenData(0);
-                    Display.TXAttenuatorOffset = 0;
-                }
+                if (m_bAttontx) NetworkIO.SetTxAttenData(getTXstepAttenuatorForBand(rx1_band)); //TX-ATT DH1KLM keep from dev_4 for Red Pitaya ATT
+                else NetworkIO.SetTxAttenData(0); //TX-ATT DH1KLM keep from dev_4 for Red Pitaya ATT
 
                 enableAudioAmplfier(); // MW0LGE_22b
 
@@ -28283,7 +28264,7 @@ namespace Thetis
             //{
             //    comboPreamp.Enabled = !chkMOX.Checked;
             //}
-            updateAttNudsCombos();
+            //updateAttNudsCombos();
 
             SetupForm.MOX = chkMOX.Checked;
             ResetMultiMeterPeak();
@@ -28329,11 +28310,11 @@ namespace Thetis
             chkVFOLock.Enabled = !chkMOX.Checked; //MW0LGE_21d3
             chkVFOBLock.Enabled = !chkMOX.Checked; //MW0LGE_21d3
 
-            //if (m_bAttontx) //[2.10.3.6]MW0LGE att_fixes
-            //{
-            //    comboPreamp.Enabled = !chkMOX.Checked;
-            //}
-            updateAttNudsCombos();
+            if (m_bAttontx) //TX-ATT DH1KLM keep from dev_4 for Red Pitaya ATT
+            { //TX-ATT DH1KLM keep from dev_4 for Red Pitaya ATT
+                comboPreamp.Enabled = !chkMOX.Checked; //TX-ATT DH1KLM keep from dev_4 for Red Pitaya ATT
+            } //TX-ATT DH1KLM keep from dev_4 for Red Pitaya ATT
+            //updateAttNudsCombos();
 
             SetupForm.MOX = chkMOX.Checked;
             ResetMultiMeterPeak();
@@ -28342,76 +28323,7 @@ namespace Thetis
             picNoiseGate.Invalidate();
         }
 
-        private void updateAttNudsCombos()
-        {
-            if (rx1_step_att_present)
-                udRX1StepAttData.BringToFront();
-            else
-                comboPreamp.BringToFront();
-            if (rx2_step_att_present)
-                udRX2StepAttData.BringToFront();
-            else
-                comboRX2Preamp.BringToFront();
-
-            //update the nud and combos, for attenuators, both rx and tx
-            bool bShowOnMox = _mox && (_isexpanded || (_iscollapsed && !(_showAndromedaTopControls || _showAndromedaButtonBar)));
-            if (bShowOnMox)
-            {
-                if (VFOATX || (VFOBTX && !rx2_enabled))
-                {
-                    //if txing on rx1 (split or non-split), then the att combo and nud will be disabled for rx1
-                    comboPreamp.Enabled = false;
-                    udRX1StepAttData.Enabled = false;
-                    comboRX2Preamp.Enabled = true;
-                    udRX2StepAttData.Enabled = true;
-
-                    //move it to rx1
-                    udTXStepAttData.Location = udRX1StepAttData.Location;
-                    udTXStepAttData.Parent = udRX1StepAttData.Parent;
-                    udTXStepAttData.BringToFront();
-                    udTXStepAttData.Visible = m_bAttontx;
-                    lblPreamp.Text = m_bAttontx ? "Tx-ATT" : (rx1_step_att_present ? "S-ATT" : "ATT");
-                }
-                else if (VFOBTX && rx2_enabled)
-                {
-                    //if txing on rx2 then the att combo and nud will be disabled for rx2
-                    comboPreamp.Enabled = true;
-                    udRX1StepAttData.Enabled = true;
-                    comboRX2Preamp.Enabled = false;
-                    udRX2StepAttData.Enabled = false;
-
-                    //move it to rx2
-                    udTXStepAttData.Location = udRX2StepAttData.Location;
-                    udTXStepAttData.Parent = udRX2StepAttData.Parent;
-                    udTXStepAttData.BringToFront();
-                    udTXStepAttData.Visible = m_bAttontx;
-                    lblRX2Preamp.Text = m_bAttontx ? "Tx-ATT" : (rx2_step_att_present ? "S-ATT" : "ATT");
-                }
-                else
-                {
-                    // should not get here
-                }
-            }
-            else
-            { //rx
-                comboPreamp.Enabled = true;
-                udRX1StepAttData.Enabled = true;
-                comboRX2Preamp.Enabled = rx2_preamp_present;
-                udRX2StepAttData.Enabled = rx2_preamp_present;
-                udTXStepAttData.Visible = false;
-                lblPreamp.Text = rx1_step_att_present ? "S-ATT" : "ATT";
-                lblRX2Preamp.Text = rx2_step_att_present ? "S-ATT" : (rx2_preamp_present ? "ATT" : "");
-            }
-
-            if (_iscollapsed && !_isexpanded)
-            {
-                //MW0LGE we need to move the meters to top, because in collasped mode the bring to fronts above
-                //will cause the combo to be above everything, including meters.
-                MeterManager.BringToFront();
-            }
-        }
-
-        private bool _mox = false;
+        private bool _mox = false; //DH1KLM keep from dev_4 for Red Pitaya ATT
         private PreampMode temp_mode = PreampMode.HPSDR_OFF; // HPSDR preamp mode
         private PreampMode temp_mode2 = PreampMode.HPSDR_OFF; // HPSDR preamp mode
 
@@ -28660,7 +28572,7 @@ namespace Thetis
                     if (current_hpsdr_model == HPSDRModel.HPSDR)
                     {
                         temp_mode = RX1PreampMode;
-                        SetupForm.RX1EnableAtt = false;
+                        SetupForm.HermesEnableAttenuator = false; //DH1KLM keep from dev_4 for Red Pitaya ATT
                         RX1PreampMode = PreampMode.HPSDR_OFF;			// set to -20dB
                         if (rx2_preamp_present)
                         {
@@ -28676,26 +28588,18 @@ namespace Thetis
                         //                 radio.GetDSPTX(0).CurrentDSPMode == DSPMode.CWU)) SetupForm.ATTOnTX = 31; // reset when PS is OFF or in CW mode
 
                         //MW0LGE [2.9.0.7] added option to always apply 31 att from setup form when not in ps
-                        int txAtt = getTXstepAttenuatorForBand(tx_band);
-                        if ((!chkFWCATUBypass.Checked && _forceATTwhenPSAoff) ||
+                        if ((!chkFWCATUBypass.Checked && _forceATTwhenPSAoff) || //DH1KLM keep from dev_4 for Red Pitaya ATT
                                         (radio.GetDSPTX(0).CurrentDSPMode == DSPMode.CWL ||
-                                         radio.GetDSPTX(0).CurrentDSPMode == DSPMode.CWU)) txAtt = 31; // reset when PS is OFF or in CW mode
+                                         radio.GetDSPTX(0).CurrentDSPMode == DSPMode.CWU)) SetupForm.ATTOnTX = 31; //DH1KLM keep from dev_4 for Red Pitaya ATT // reset when PS is OFF or in CW mode
 
-                        SetupForm.ATTOnRX1 = getRX1stepAttenuatorForBand(rx1_band); //[2.10.3.6]MW0LGE att_fixes
-                        SetupForm.ATTOnTX = txAtt; //[2.10.3.6]MW0LGE att_fixes NOTE: this will eventually call Display.TXAttenuatorOffset with the value
-                        NetworkIO.SetTxAttenData(txAtt); //[2.10.3.6]MW0LGE att_fixes
-
-                        //SetupForm.RX1EnableAtt = true; //[2.10.3.6]MW0LGE att_fixes
-                        //comboRX2Preamp.Enabled = false; //[2.10.3.6]MW0LGE att_fixes
-                        //udRX2StepAttData.Enabled = false; //[2.10.3.6]MW0LGE att_fixes
-                        updateAttNudsCombos();
+                        SetupForm.HermesAttenuatorData = getTXstepAttenuatorForBand(rx1_band); //DH1KLM keep from dev_4 for Red Pitaya ATT
+                        NetworkIO.SetTxAttenData(getTXstepAttenuatorForBand(rx1_band)); //DH1KLM keep from dev_4 for Red Pitaya ATT
+                        SetupForm.HermesEnableAttenuator = true; //DH1KLM keep from dev_4 for Red Pitaya ATT
+                        comboRX2Preamp.Enabled = false; //DH1KLM keep from dev_4 for Red Pitaya ATT
+                        udRX2StepAttData.Enabled = false; //DH1KLM keep from dev_4 for Red Pitaya ATT
                     }
                 }
-                else
-                {
-                    NetworkIO.SetTxAttenData(0);
-                    Display.TXAttenuatorOffset = 0; //[2.10.3.6]MW0LGE att_fixes
-                }
+                else NetworkIO.SetTxAttenData(0); //DH1KLM keep from dev_4 for Red Pitaya ATT
 
                 UpdateAAudioMixerStates();
                 UpdateDDCs(rx2_enabled);
@@ -28765,20 +28669,15 @@ namespace Thetis
                     }
                     else
                     {
-                        //comboRX2Preamp.Enabled = true; //[2.10.3.6]MW0LGE att_fixes
-                        //udRX2StepAttData.Enabled = true; //[2.10.3.6]MW0LGE att_fixes
-                        updateAttNudsCombos();
+                        comboRX2Preamp.Enabled = true; //DH1KLM keep from dev_4 for Red Pitaya ATT
+                        udRX2StepAttData.Enabled = true; //DH1KLM keep from dev_4 for Red Pitaya ATT
 
                         update_preamp_mode = true;
                         update_preamp = true;
                         UpdatePreamps();
                     }
                 }
-                else
-                {
-                    NetworkIO.SetTxAttenData(0);
-                    Display.TXAttenuatorOffset = 0; //[2.10.3.6]MW0LGE att_fixes
-                }
+                else NetworkIO.SetTxAttenData(0); //DH1KLM keep from dev_4 for Red Pitaya ATT
             }
 
             if (!tx)
@@ -42245,24 +42144,23 @@ namespace Thetis
 
             setupHiddenButton();//grpVFOA); //MW0LGE_21a
 
-            //[2.10.3.6]MW0LGE now down below after the expanded flag change, as updateAttNudsCombos
-            //if (rx1_step_att_present)
-            //{
-            //    udRX1StepAttData.BringToFront();
-            //}
-            //else
-            //{
-            //    comboPreamp.BringToFront();
-            //}
+            if (rx1_step_att_present) //DH1KLM keep from dev_4 for Red Pitaya ATT
+            { //DH1KLM keep from dev_4 for Red Pitaya ATT
+                udRX1StepAttData.BringToFront(); //DH1KLM keep from dev_4 for Red Pitaya ATT
+            } //DH1KLM keep from dev_4 for Red Pitaya ATT
+            else //DH1KLM keep from dev_4 for Red Pitaya ATT
+            { //DH1KLM keep from dev_4 for Red Pitaya ATT
+                comboPreamp.BringToFront(); //DH1KLM keep from dev_4 for Red Pitaya ATT
+            } //DH1KLM keep from dev_4 for Red Pitaya ATT
 
-            //if (rx2_step_att_present)
-            //{
-            //    udRX2StepAttData.BringToFront();
-            //}
-            //else
-            //{
-            //    comboRX2Preamp.BringToFront();
-            //}
+            if (rx2_step_att_present) //DH1KLM keep from dev_4 for Red Pitaya ATT
+            { //DH1KLM keep from dev_4 for Red Pitaya ATT
+                udRX2StepAttData.BringToFront(); //DH1KLM keep from dev_4 for Red Pitaya ATT
+            } //DH1KLM keep from dev_4 for Red Pitaya ATT
+            else //DH1KLM keep from dev_4 for Red Pitaya ATT
+            { //DH1KLM keep from dev_4 for Red Pitaya ATT
+                comboRX2Preamp.BringToFront(); //DH1KLM keep from dev_4 for Red Pitaya ATT
+            } //DH1KLM keep from dev_4 for Red Pitaya ATT
 
             // G8NJJ
             comboDisplayMode.Parent = panelDisplay2;
@@ -42405,7 +42303,7 @@ namespace Thetis
             _isexpanded = true;
             _iscollapsed = false;
 
-            updateAttNudsCombos(); //[2.10.3.6]MW0LGE
+            //updateAttNudsCombos(); //[2.10.3.6]MW0LGE
 
             updateLegacyMeterControls(true);// [2.10.1.0] MW0LGE
 
@@ -43937,7 +43835,15 @@ namespace Thetis
         {
             if (_updatingRX1StepAttData) return;
             _updatingRX1StepAttData = true;
-            if (!IsSetupFormNull) SetupForm.ATTOnRX1 = (int)udRX1StepAttData.Value; //[2.10.3.6]MW0LGE
+            if (!IsSetupFormNull) //DH1KLM keep from dev_4 for Red Pitaya ATT
+            { //DH1KLM keep from dev_4 for Red Pitaya ATT
+                if (_mox) //DH1KLM keep from dev_4 for Red Pitaya ATT
+                { //DH1KLM keep from dev_4 for Red Pitaya ATT
+                    if (udRX1StepAttData.Value > 31) udRX1StepAttData.Value = 31; //DH1KLM keep from dev_4 for Red Pitaya ATT
+                    SetupForm.ATTOnTX = (int)udRX1StepAttData.Value; //DH1KLM keep from dev_4 for Red Pitaya ATT
+                } //DH1KLM keep from dev_4 for Red Pitaya ATT
+                SetupForm.HermesAttenuatorData = (int)udRX1StepAttData.Value; //DH1KLM keep from dev_4 for Red Pitaya ATT
+            } //DH1KLM keep from dev_4 for Red Pitaya ATT
             if (udRX1StepAttData.Focused) btnHidden.Focus();
             if (sliderForm != null) sliderForm.RX1Atten = (int)udRX1StepAttData.Value;
             lblAttenLabel.Text = udRX1StepAttData.Value.ToString() + " dB";
@@ -43950,7 +43856,15 @@ namespace Thetis
             if (_updatingRX2StepAttData) return;
             _updatingRX2StepAttData = true;
 
-            if (!IsSetupFormNull) SetupForm.ATTOnRX2 = (int)udRX2StepAttData.Value; //[2.10.3.6]MW0LGE
+            if (!IsSetupFormNull) //DH1KLM keep from dev_4 for Red Pitaya ATT
+            { //DH1KLM keep from dev_4 for Red Pitaya ATT
+                if (_mox && (RX2Enabled && VFOBTX)) //DH1KLM keep from dev_4 for Red Pitaya ATT
+                { //DH1KLM keep from dev_4 for Red Pitaya ATT
+                    if (udRX2StepAttData.Value > 31) udRX2StepAttData.Value = 31; //DH1KLM keep from dev_4 for Red Pitaya ATT
+                    SetupForm.ATTOnTX = (int)udRX2StepAttData.Value; //DH1KLM keep from dev_4 for Red Pitaya ATT
+                }//DH1KLM keep from dev_4 for Red Pitaya ATT
+                SetupForm.HermesAttenuatorDataRX2 = (int)udRX2StepAttData.Value; //DH1KLM keep from dev_4 for Red Pitaya ATT
+            }//DH1KLM keep from dev_4 for Red Pitaya ATT
             if (udRX2StepAttData.Focused) btnHidden.Focus();
             if (sliderForm != null) sliderForm.RX2Atten = (int)udRX2StepAttData.Value;
             lblRX2AttenLabel.Text = udRX2StepAttData.Value.ToString() + " dB";
@@ -43961,8 +43875,8 @@ namespace Thetis
         {
             if (current_hpsdr_model != HPSDRModel.HPSDR && !_mox)
             {
-                SetupForm.RX1EnableAtt = !SetupForm.RX1EnableAtt;
-                if (RX1RX2usingSameADC) SetupForm.RX2EnableAtt = SetupForm.RX1EnableAtt; //MW0LGE_22b
+                SetupForm.HermesEnableAttenuator = !SetupForm.HermesEnableAttenuator;//DH1KLM keep from dev_4 for Red Pitaya ATT
+                if (RX1RX2usingSameADC) SetupForm.RX2EnableAtt = SetupForm.HermesEnableAttenuator; //DH1KLM keep from dev_4 for Red Pitaya ATT //MW0LGE_22b
             }
         }
 
@@ -43971,7 +43885,7 @@ namespace Thetis
             if (current_hpsdr_model != HPSDRModel.HPSDR && !_mox)
             {
                 SetupForm.RX2EnableAtt = !SetupForm.RX2EnableAtt;
-                if (RX1RX2usingSameADC) SetupForm.RX1EnableAtt = SetupForm.RX2EnableAtt;//MW0LGE_22b
+                if (RX1RX2usingSameADC) SetupForm.HermesEnableAttenuator = SetupForm.RX2EnableAtt; //DH1KLM keep from dev_4 for Red Pitaya ATT //MW0LGE_22b 
             }
         }
 
@@ -47023,6 +46937,12 @@ namespace Thetis
                     break;
                 case ucInfoBar.ActionTypes.DisplayFill:
                     SetupForm.DisplayPanFill = e.ButtonState;
+                    break;
+                case ucInfoBar.ActionTypes.Random: // DH1KLM for Red Pitaya
+                    SetupForm.RandomOn = e.ButtonState;
+                    break;
+                case ucInfoBar.ActionTypes.Dither: // DH1KLM for Red Pitaya
+                    SetupForm.DitherOn = e.ButtonState;
                     break;
             }
         }
