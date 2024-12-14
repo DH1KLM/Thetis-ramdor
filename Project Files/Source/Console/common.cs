@@ -1428,6 +1428,8 @@ namespace Thetis
                     return HPSDRModel.ANAN_G2_1K;
                 case "ANVELINA-PRO3":
                     return HPSDRModel.ANVELINAPRO3;
+                case "RED-PITAYA":
+                    return HPSDRModel.REDPITAYA; // DH1KLM
             }
 
             return HPSDRModel.FIRST;

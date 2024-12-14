@@ -358,6 +358,18 @@ namespace Thetis
             get { return ps_rate; }
             set { ps_rate = value; }
         }
+        /* private static int ps_rate = 192000;
+           public static int PSrate
+        {
+            get { return ps_rate; } // REDPITAYA PAVEL DH1KLM https://github.com/ramdor/Thetis/pull/34/commits/2e090cd30a7511529d4f9b948650ba5439f7a278 code should be bound on HPSDRModel.REDPITAYA
+            set {ps_rate = value;
+
+                // get transmitter identifiers
+                int txinid = cmaster.inid(1, 0);        // stream id // Pavel for Red Pitaya
+                int txch = cmaster.chid(txinid, 0);     // wdsp channel // Pavel for Red Pitaya
+
+                puresignal.SetPSFeedbackRate(txch, ps_rate); // Pavel for Red Pitaya
+            }*/
 
         public static RadioProtocol CurrentRadioProtocol { get; set; }
         #endregion
@@ -491,6 +503,7 @@ namespace Thetis
                             case HPSDRModel.ANAN7000D:
                             case HPSDRModel.ANAN8000D:
                             case HPSDRModel.ANVELINAPRO3:
+                            case HPSDRModel.REDPITAYA: //DH1KLM
                                 int[] FIVE_DDC_Function = new int[48]
                                     {
                                     2, 2, 2, 2, 2, 0, 2, 0,     // DDC0+DDC1, port 1035, Call 0
@@ -573,6 +586,7 @@ namespace Thetis
                             case HPSDRModel.ANAN7000D:
                             case HPSDRModel.ANAN8000D:
                             case HPSDRModel.ANVELINAPRO3:
+                            case HPSDRModel.REDPITAYA: //DH1KLM
                                 int[] FIVE_DDC_Function = new int[24]
                                     {
                                     2, 2, 2, 2, 2, 2, 2, 2,     // DDC0+DDC1, port 1035, Call 0
@@ -608,6 +622,7 @@ namespace Thetis
                             case HPSDRModel.ANAN7000D:
                             case HPSDRModel.ANAN8000D:
                             case HPSDRModel.ANVELINAPRO3:
+                            case HPSDRModel.REDPITAYA: //DH1KLM
                             case HPSDRModel.ANAN_G2:
                             case HPSDRModel.ANAN_G2_1K:
                                 // This ANGELIA table is for test purposes and it routes DDC0 and DDC1 to RX1 and RX2, 
@@ -701,6 +716,7 @@ namespace Thetis
                             case HPSDRModel.ANAN7000D:
                             case HPSDRModel.ANAN8000D:
                             case HPSDRModel.ANVELINAPRO3:
+                            case HPSDRModel.REDPITAYA: //DH1KLM
                             case HPSDRModel.ANAN_G2:
                             case HPSDRModel.ANAN_G2_1K:
                                 // control bits are { MOX, Diversity_Enabled, PureSignal_Enabled }
