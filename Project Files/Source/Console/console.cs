@@ -2030,7 +2030,7 @@ namespace Thetis
                 infoBar.UpdateButtonState(ucInfoBar.ActionTypes.CFCeq, SetupForm.CFCPEQEnabled, false);
                 infoBar.UpdateButtonState(ucInfoBar.ActionTypes.ShowSpots, SetupForm.ShowTCISpots /*| other spots*/, false);
                 infoBar.UpdateButtonState(ucInfoBar.ActionTypes.DisplayFill, SetupForm.DisplayPanFill, true); // 
-                //infoBar.UpdateButtonState(ucInfoBar.ActionTypes.Random, SetupForm.RandomOn, false); // REDPITAYA DH1KLM for Yevgeni code should be bound on HPSDRModel.REDPITAYA
+                //infoBar.UpdateButtonState(ucInfoBar.ActionTypes.Random, SetupForm.RandomOn, false); // REDPITAYA DH1KLM for Yevgeni, should be bound to HPSDRModel.REDPITAYA. no clue how to do it.
                 //infoBar.UpdateButtonState(ucInfoBar.ActionTypes.Dither, SetupForm.DitherOn, true); // <- last one needs to be true // REDPITAYA DH1KLM
             }
 
@@ -31249,9 +31249,9 @@ namespace Thetis
                  current_hpsdr_model == HPSDRModel.ANAN_G2 ||
                  current_hpsdr_model == HPSDRModel.ANAN_G2_1K ||
                  current_hpsdr_model == HPSDRModel.ANVELINAPRO3 ||
-                 current_hpsdr_model == HPSDRModel.REDPITAYA)
+                 current_hpsdr_model == HPSDRModel.REDPITAYA)// DH1KLM
 
-                 UpdateDDCs(rx2_enabled);// UpdateRXADCCtrl(); // DH1KLM
+                 UpdateDDCs(rx2_enabled);// UpdateRXADCCtrl(); 
 
             double freq = m_dVFOAFreq;
 
@@ -48319,7 +48319,7 @@ namespace Thetis
                 case ucInfoBar.ActionTypes.DisplayFill:
                     SetupForm.DisplayPanFill = e.ButtonState;
                     break;
-/*                case ucInfoBar.ActionTypes.Random: // REDPITAYA DH1KLM for Yevgeni, code should be bound on HPSDRModel.REDPITAYA
+/*                case ucInfoBar.ActionTypes.Random: // REDPITAYA DH1KLM for Yevgeni, should be bound to HPSDRModel.REDPITAYA
                     SetupForm.RandomOn = e.ButtonState;
                     break;
                 case ucInfoBar.ActionTypes.Dither: // REDPITAYA DH1KLM

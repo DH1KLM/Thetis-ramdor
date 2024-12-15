@@ -597,20 +597,20 @@ void WriteMainLoop(char* bufp)
 			C4 = (prn->adc[0].rx_step_attn & 0b00011111) | 0b00100000;
 			break;
 
-		case 12: // Step ATT control
+		case 12: // Step ATT control // REDPITAYA DH1KLM, some lines are removed in Pavels version, see outcomented part below.
 			C0 |= 0x16; //C0 0001 011x 
-			if (XmitBit) // REDPITAYA DH1KLM, line is removed in Pavels version 
-				C1 = 0x1F; // REDPITAYA DH1KLM, line is removed in Pavels version
-			else // // REDPITAYA DH1KLM, line is removed in Pavels version see outcomented part below
+			if (XmitBit) 
+				C1 = 0x1F; 
+			else 
 				C1 = (prn->adc[1].rx_step_attn);
 			C1 |= 0b00100000;
 			C2 = (prn->adc[2].rx_step_attn & 0b00011111) | 0b00100000 |
 				((prn->cw.rev_paddle & 1) << 6);
 
-			/* case 12: //Step ATT control https://github.com/ramdor/Thetis/pull/34/commits/f367f650902b98bc2c6526064ae202c956cc453d
+			/* case 12: //Step ATT control https://github.com/ramdor/Thetis/pull/34/commits/f367f650902b98bc2c6526064ae202c956cc453d 
 			C0 |= 0x16; //C0 0001 011x
-			C1 = (prn->adc[1].rx_step_attn & 0b00011111) | 0b00100000; // code should be bound on HPSDRModel.REDPITAYA
-			C2 = (prn->adc[2].rx_step_attn & 0b00011111) | 0b00100000 |
+			C1 = (prn->adc[1].rx_step_attn & 0b00011111) | 0b00100000; // I assume the code should be bound to HPSDR Model.REDPITAYA to work properly with this controller https://github.com/pavel-demin/so2r-cb-fw but dont know how to do it.
+			C2 = (prn->adc[2].rx_step_attn & 0b00011111) | 0b00100000 | 
 				((prn->cw.rev_paddle & 1) << 6); */
 
 			if (prn->cw.iambic == 0)

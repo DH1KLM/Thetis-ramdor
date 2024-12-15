@@ -361,15 +361,16 @@ namespace Thetis
         /* private static int ps_rate = 192000;
            public static int PSrate
         {
-            get { return ps_rate; } // REDPITAYA PAVEL DH1KLM https://github.com/ramdor/Thetis/pull/34/commits/2e090cd30a7511529d4f9b948650ba5439f7a278 code should be bound on HPSDRModel.REDPITAYA
-            set {ps_rate = value;
+            get { return ps_rate; } // REDPITAYA PAVEL DH1KLM, should be bound to HPSDRModel.REDPITAYA https://github.com/ramdor/Thetis/pull/34/commits/2e090cd30a7511529d4f9b948650ba5439f7a278 
+            set {ps_rate = value; // no clue how to do it.
 
                 // get transmitter identifiers
-                int txinid = cmaster.inid(1, 0);        // stream id // Pavel for Red Pitaya
-                int txch = cmaster.chid(txinid, 0);     // wdsp channel // Pavel for Red Pitaya
+                int txinid = cmaster.inid(1, 0);        // stream id  REDPITAYA Pavel
+                int txch = cmaster.chid(txinid, 0);     // wdsp channel REDPITAYA Pavel
 
-                puresignal.SetPSFeedbackRate(txch, ps_rate); // Pavel for Red Pitaya
-            }*/
+                puresignal.SetPSFeedbackRate(txch, ps_rate); // REDPITAYA Pavel
+            */
+        }
 
         public static RadioProtocol CurrentRadioProtocol { get; set; }
         #endregion
