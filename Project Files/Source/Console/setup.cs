@@ -20335,9 +20335,9 @@ namespace Thetis
                     udHermesStepAttenuatorData.Enabled = true;
                     chkRX2StepAtt.Enabled = true;
                     udHermesStepAttenuatorDataRX2.Enabled = true;
-                    groupBoxRXOptions.Text = "ANAN Options";
-                    grpMetisAddr.Text = "ANAN Address";
-                    grpHermesStepAttenuator.Text = "ANAN Step Attenuator";
+                    groupBoxRXOptions.Text = "RED-PITAYA Options";
+                    grpMetisAddr.Text = "RED-PITAYA Address";
+                    grpHermesStepAttenuator.Text = "Step Attenuator";
                     chkAlexPresent_CheckedChanged(this, EventArgs.Empty);
                     chkAlexAntCtrl_CheckedChanged(this, EventArgs.Empty);
                     chkAutoPACalibrate.Checked = false;
