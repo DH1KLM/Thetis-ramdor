@@ -369,8 +369,8 @@ namespace Thetis
                 int txch = cmaster.chid(txinid, 0);     // wdsp channel REDPITAYA Pavel
 
                 puresignal.SetPSFeedbackRate(txch, ps_rate); // REDPITAYA Pavel
-            */
-        }
+            
+        }*/
 
         public static RadioProtocol CurrentRadioProtocol { get; set; }
         #endregion
