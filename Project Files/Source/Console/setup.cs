@@ -6375,9 +6375,10 @@ namespace Thetis
                 !chkGeneralRXOnly.Checked)
             {
                 DialogResult dr = MessageBox.Show(
-                    "Unchecking Receive Only while in Unsupported Card mode may \n" +
-                    "cause damage to your SDR-1000 hardware.  Are you sure you want \n" +
-                    "to enable transmit?",
+                    "Unchecking may cause damage\n" +
+                    "to your SDR hardware.\n" +
+                    "                          \n" +
+                    "Are you sure you want to enable transmit?",
                     "Warning: Enable Transmit?",
                     MessageBoxButtons.YesNo,
                     MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2, Common.MB_TOPMOST); //MW0LGE_[2.9.0.7]);
