@@ -6091,8 +6091,8 @@ namespace Thetis
                 console.CurrentHPSDRModel == HPSDRModel.ANAN7000D ||
                 console.CurrentHPSDRModel == HPSDRModel.ANAN_G2 ||
                 console.CurrentHPSDRModel == HPSDRModel.ANAN_G2_1K ||
-                console.CurrentHPSDRModel == HPSDRModel.ANVELINAPRO3 ||
-                console.CurrentHPSDRModel == HPSDRModel.REDPITAYA) // DH1KLM
+                console.CurrentHPSDRModel == HPSDRModel.ANVELINAPRO3) // ||
+                //console.CurrentHPSDRModel == HPSDRModel.REDPITAYA) // DH1KLM
             {
                 chkLPFBypass.Checked = false;
                 chkLPFBypass.Visible = false;
@@ -6101,6 +6101,7 @@ namespace Thetis
                 chkBPF2Gnd.Visible = true;
                 chkEnableXVTRHF.Visible = true;
                 toolTip1.SetToolTip(chkEXT2OutOnTx, "Enable Rx BYPASS during transmit.");
+
                 if (console.CurrentHPSDRModel == HPSDRModel.ANAN_G2 ||
                     console.CurrentHPSDRModel == HPSDRModel.ANAN_G2_1K)
                 {
@@ -6112,6 +6113,14 @@ namespace Thetis
                     panelSaturnMicInput.Visible = false;
                     lblSaturnMicInput.Visible = false;
                 }
+                if (console.CurrentHPSDRModel == HPSDRModel.REDPITAYA) // DH1KLM testing for REDPITAYA
+                {   
+                    chkLPFBypass.Checked = false;
+                    chkLPFBypass.Visible = true;
+                }
+                    
+            
+
             }
             else
             {
