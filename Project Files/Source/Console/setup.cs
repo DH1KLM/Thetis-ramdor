@@ -13061,7 +13061,7 @@ namespace Thetis
         {
             if (initializing) return;
             int v = chkMercRandom.Checked ? 1 : 0;
-            // console.SetupInfoBarButton(ucInfoBar.ActionTypes.Random, chkMercRandom.Checked); //REDPITAYA DH1KLM
+            // console.SetupInfoBarButton(ucInfoBar.ActionTypes.Random, chkMercRandom.Checked); //REDPITAYA DH1KLM for Yevgeni
             NetworkIO.SetADCRandom(v);
         }
 
@@ -15494,7 +15494,7 @@ namespace Thetis
                 case HPSDRModel.ANAN7000D:
                 case HPSDRModel.ANAN8000D:
                 case HPSDRModel.ANVELINAPRO3:
-                case HPSDRModel.REDPITAYA: // DH1KLM
+                case HPSDRModel.REDPITAYA: // REDPITAYA DH1KLM
                 case HPSDRModel.ANAN_G2:
                 case HPSDRModel.ANAN_G2_1K:
                     lblHFRxControl.Text = "OC Receive Pins";
@@ -15703,7 +15703,7 @@ namespace Thetis
                 console.CurrentHPSDRModel != HPSDRModel.ANAN_G2 &&
                 console.CurrentHPSDRModel != HPSDRModel.ANAN_G2_1K &&
                 console.CurrentHPSDRModel != HPSDRModel.ANVELINAPRO3 &&
-                console.CurrentHPSDRModel != HPSDRModel.REDPITAYA) // DH1KLM
+                console.CurrentHPSDRModel != HPSDRModel.REDPITAYA) // REDPITAYA DH1KLM
                 udHermesStepAttenuatorData.Maximum = (decimal)61;
             else udHermesStepAttenuatorData.Maximum = (decimal)31;
             _updatingRX1HermesStepAttData = false;
@@ -15746,7 +15746,7 @@ namespace Thetis
                 console.CurrentHPSDRModel != HPSDRModel.ANAN_G2 &&
                 console.CurrentHPSDRModel != HPSDRModel.ANAN_G2_1K &&
                 console.CurrentHPSDRModel != HPSDRModel.ANVELINAPRO3 &&
-                console.CurrentHPSDRModel == HPSDRModel.REDPITAYA) // DH1KLM
+                console.CurrentHPSDRModel == HPSDRModel.REDPITAYA) // REDPITAYA DH1KLM
                 udHermesStepAttenuatorDataRX2.Maximum = (decimal)61;
             else udHermesStepAttenuatorDataRX2.Maximum = (decimal)31;
             _updatingRX2HermesStepAttData = false;
@@ -20328,7 +20328,7 @@ namespace Thetis
                     setupAttRXControls(2);
                     break;
 
-                case HPSDRModel.REDPITAYA: // DH1KLM
+                case HPSDRModel.REDPITAYA: // REDPITAYA DH1KLM
                     console.CurrentHPSDRModel = HPSDRModel.REDPITAYA;
                     chkPennyPresent.Checked = false;
                     chkPennyPresent.Enabled = false;
@@ -23523,7 +23523,7 @@ namespace Thetis
                             if (g != 1000 && bRemoveOld) removeOldPASetting(sSetting);
                         }
                         break;
-                    case HPSDRModel.REDPITAYA: // DH1KLM
+                    case HPSDRModel.REDPITAYA: // REDPITAYA DH1KLM
                         for (int n = (int)Band.B160M; n <= (int)Band.B6M; n++)
                         {
                             Band b = (Band)n;

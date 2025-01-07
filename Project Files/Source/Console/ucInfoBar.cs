@@ -53,7 +53,7 @@ namespace Thetis
             CFCeq,
             Leveler,
             // Random, // REDPITAYA DH1KLM for Yevgeni, code should be bound on HPSDRModel.REDPITAYA
-            // Dither, // REDPITAYA DH1KLM
+            // Dither, // REDPITAYA DH1KLM for Yevgeni, code should be bound on HPSDRModel.REDPITAYA
             LAST
         }
 
@@ -148,10 +148,10 @@ namespace Thetis
                             return "Spots";
                         case ActionTypes.DisplayFill:
                             return "Fill";
-                        /* case ActionTypes.Random: // RX2 Ant.1 // REDPITAYA DH1KLM for Yevgeni, code should be bound on HPSDRModel.REDPITAYA
-                            return "Rx2A1";
-                        case ActionTypes.Dither: // RX2 Ant.2 // REDPITAYA DH1KLM
-                            return "Rx2A2"; */
+                            /* case ActionTypes.Random: // RX2 Ant.1 // REDPITAYA DH1KLM for Yevgeni, code should be bound on HPSDRModel.REDPITAYA
+                                return "Rx2A1";
+                            case ActionTypes.Dither: // RX2 Ant.2 // REDPITAYA DH1KLM for Yevgeni, code should be bound on HPSDRModel.REDPITAYA
+                                return "Rx2A2"; */
 
                     }
                     return "?";
@@ -180,10 +180,10 @@ namespace Thetis
                             return "Show spots";
                         case ActionTypes.DisplayFill:
                             return "Fill the panadaptor";
-                     /* case ActionTypes.Random: // RX2 Ant.1
-                            return "Activate Antenna 1 on RX2 for Red Pitaya"; // REDPITAYA DH1KLM for Yevgeni, code should be bound on HPSDRModel.REDPITAYA
-                        case ActionTypes.Dither: // RX2 Ant.2
-                            return "Activate Antenna 2 on RX2 for Red Pitaya"; // REDPITAYA DH1KLM */
+                            /* case ActionTypes.Random: // RX2 Ant.1
+                                   return "Activate Antenna 1 on RX2 for Red Pitaya"; // REDPITAYA DH1KLM for Yevgeni, code should be bound on HPSDRModel.REDPITAYA
+                               case ActionTypes.Dither: // RX2 Ant.2
+                                   return "Activate Antenna 2 on RX2 for Red Pitaya"; // REDPITAYA DH1KLM for Yevgeni, code should be bound on HPSDRModel.REDPITAYA */
                     }
                     return "";
                 }

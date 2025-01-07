@@ -78,7 +78,7 @@
         ANAN_G2,        //G8NJJ
         ANAN_G2_1K,     //G8NJJ
         ANVELINAPRO3,
-        REDPITAYA, // DH1KLM
+        REDPITAYA, // REDPITAYA DH1KLM
         LAST
     }
 
@@ -99,7 +99,7 @@
         ANAN_G2,        //G8NJJ
         ANAN_G2_1K,     //G8NJJ
         ANVELINAPRO3,
-        REDPITAYA, // DH1KLM
+        REDPITAYA, // REDPITAYA DH1KLM
         LAST
     }
 
